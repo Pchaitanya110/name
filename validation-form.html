@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Validation Form
+    </title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<style>
+    .validation-form {
+        border-style: solid;
+        /* margin-bottom: 10px; */
+        /* margin-left: 10px; */
+        padding: 10px;
+        /* width: 50%; */
+        margin: auto;
+        width: 50%;
+        /* border: 3px solid green; */
+        /* padding: 10px; */
+    }
+
+    .validation-table {
+        border-style: solid;
+        /* margin-bottom: 10px; */
+        /* margin-left: 10px; */
+        padding: 20px;
+        /* width: 50%; */
+        margin: auto;
+        width: 70%;
+        /* border: 3px solid green; */
+        /* padding: 10px; */
+    }
+
+    body>table {
+        width: 80%;
+    }
+
+    table {
+        border-color:red;
+        border-width: 1px;
+    }
+
+    table.list {
+        width: 100%;
+    }
+
+    td,
+    th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even),
+    table.list thead>tr {
+        background-color: #dddddd;
+    }
+    
+    .email1{
+        width: 45%;
+        padding: 8px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }        
+    
+
+    input[type=number],
+    [type=date] {
+        width: 45%;
+        padding: 8px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    input[type=radio] {
+        width: 10%;
+        padding: 8px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    input[type=text] {
+        width: 100%;
+        padding: 8px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    input[type=submit] {
+        width: 30%;
+        background-color: black;
+        color: white;
+        padding: 10px 18px;
+        /* margin: 0px 0; */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    form div.form-action-buttons {
+        text-align: right;
+    }
+
+    a {
+        cursor: pointer;
+        text-decoration: underline;
+        color: #0000ee;
+        margin-right: 4px;
+    }
+
+    span {
+        color: red;
+        margin-left: 5px;
+    }
+
+    .hide {
+        display: none;
+    }
+</style>
+
+<body>
+
+    <h1>
+        <center>Validation Form</center>
+    </h1>
+    <hr>
+    <div class="validation-form">
+        <form onsubmit="event.preventDefault();onFormSubmit();" autocomplete="off">
+            <div>
+
+                <input type="text" placeholder="FullName" name="fullName" id="fullName">
+                <span  id="fullNameValidationError" ></span>
+               <!-- <label class="validation-error hide" id="fullNameValidationError">This field is required.</label> 
+                <label class="validation-error hide" id="fullNameValidationErrorOne">This fullname field Must contain 3-20 char</label> -->
+            </div>
+            <div>
+                <input type="text" placeholder="Email Id" name="email" id="email" class="email1" style="width: 45%;">
+                <span  id="emailError"></span>
+                <input type="text" placeholder="Mobile Number" name="mobilenum" id="mobilenum" style="width: 45%;">
+                <span  id="mobilenumError"></span>
+            </div>
+
+            <div>
+
+                <input type="text" placeholder="Project" name="project" id="project">
+                <span  id="projectError"></span>
+            </div>
+            <div>
+
+                <input type="text" placeholder="task description" name="task" id="task">
+                <span  id="taskError"></span>
+            </div>
+            <div>
+                <input type="date" placeholder="start-date" id="startdate" name="startdate">
+                <span  id="startDateError"></span>
+
+                <input type="date" placeholder="end-date" id="enddate" name="enddate">
+                <span  id="endDateError"></span>
+
+            </div>
+
+            <div>
+                <label>Task Status</label>
+                <label> <input type="radio" name="taskStatus" className="taskStatus" value="planned">planned</label>
+                <label> <input type="radio" name="taskStatus" className="taskStatus" value="in-progess">in-progess</label>
+                <label><input type="radio" name="taskStatus" className="taskStatus" value="done">done</label>
+
+            </div>
+            </br>
+            <div class="form-action-buttons">
+                <input type="submit" value="Submit">
+            </div>
+        </form>
+    </div>
+    <br />
+    <div class="validation-table">
+        <table class="list" id="validationList">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email Id</th>
+                    <th>Mobile Number</th>
+                    <th>Project</th>
+                    <th>Task Descrption</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Task Status</th>
+                    <th>edit/del</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+    <script>
+
+        var selectedRow = null
+
+        function onFormSubmit() {
+            console.log('validate', validate());
+            if (validate()) {
+                var formData = readFormData();
+                if (selectedRow == null)
+                    insertNewRecord(formData);
+                else
+                    updateRecord(formData);
+                resetForm();
+            }
+        }
+
+        function readFormData() {
+            var formData = {};
+            formData["fullName"] = document.getElementById("fullName").value;
+            formData["email"] = document.getElementById("email").value;
+            formData["mobilenum"] = document.getElementById("mobilenum").value;
+            formData["project"] = document.getElementById("project").value;
+            formData["task"] = document.getElementById("task").value;
+            formData["startdate"] = document.getElementById("startdate").value;
+            formData["enddate"] = document.getElementById("enddate").value;
+            var ts = document.getElementsByName('taskStatus');
+            for (i = 0; i < ts.length; i++) {
+                if (ts[i].checked) {
+                    formData["taskStatus"] = ts[i].value;
+                }
+            }
+            return formData;
+        }
+
+        function insertNewRecord(data) {
+            var table = document.getElementById("validationList").getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow(table.length);
+            cell1 = newRow.insertCell(0);
+            cell1.innerHTML = data.fullName;
+            cell2 = newRow.insertCell(1);
+            cell2.innerHTML = data.email;
+            cell3 = newRow.insertCell(2);
+            cell3.innerHTML = data.mobilenum;
+            cell4 = newRow.insertCell(3);
+            cell4.innerHTML = data.project;
+            cell5 = newRow.insertCell(4);
+            cell5.innerHTML = data.task;
+            cell6 = newRow.insertCell(5);
+            cell6.innerHTML = data.startdate;
+            cell7 = newRow.insertCell(6);
+            cell7.innerHTML = data.enddate;
+            cell8 = newRow.insertCell(7);
+            cell8.innerHTML = data.taskStatus;
+
+            cell8 = newRow.insertCell(8);
+            cell8.innerHTML = `<a onClick="onEdit(this)">Edit</a>
+                       <a onClick="onDelete(this)">Delete</a>`;
+        }
+
+        function resetForm() {
+            document.getElementById("fullName").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("mobilenum").value = "";
+            document.getElementById("project").value = "";
+            document.getElementById("task").value = "";
+            document.getElementById("startdate").value = "";
+            document.getElementById("enddate").value = "";
+            document.getElementsByClassName("taskStatus").value = "";
+            selectedRow = null;
+        }
+
+        function onEdit(td) {
+            selectedRow = td.parentElement.parentElement;
+            document.getElementById("fullName").value = selectedRow.cells[0].innerHTML;
+            document.getElementById("email").value = selectedRow.cells[1].innerHTML;
+            document.getElementById("mobilenum").value = selectedRow.cells[2].innerHTML;
+            document.getElementById("project").value = selectedRow.cells[3].innerHTML;
+            document.getElementById("task").value = selectedRow.cells[4].innerHTML;
+            document.getElementById("startdate").value = selectedRow.cells[5].innerHTML;
+            document.getElementById("enddate").value = selectedRow.cells[6].innerHTML;
+            document.getElementsByClassName("taskStatus").value = selectedRow.cells[7].innerHTML;
+        }
+        function updateRecord(formData) {
+            selectedRow.cells[0].innerHTML = formData.fullName;
+            selectedRow.cells[1].innerHTML = formData.email;
+            selectedRow.cells[2].innerHTML = formData.mobilenum;
+            selectedRow.cells[3].innerHTML = formData.project;
+            selectedRow.cells[4].innerHTML = formData.task;
+            selectedRow.cells[5].innerHTML = formData.startdate;
+            selectedRow.cells[6].innerHTML = formData.enddate;
+            selectedRow.cells[7].innerHTML = formData.taskStatus;
+        }
+
+        function onDelete(td) {
+            if (confirm('Are you sure to delete this record ?')) {
+                row = td.parentElement.parentElement;
+                document.getElementById("validationList").deleteRow(row.rowIndex);
+                resetForm();
+            }
+        }
+function validate() {
+    console.log('in Validate', document.getElementById('fullName').value);
+    var name=document.getElementById('fullName').value;
+    var email=document.getElementById('email').value;
+    var mobileno=document.getElementById('mobilenum').value;
+    var project=document.getElementById('project').value;
+    var task=document.getElementById('task').value;
+    var startDate = document.getElementById('startdate').value;
+    var endDate = document.getElementById('enddate').value;
+    var taskStatus = document.getElementsByClassName("taskStatus").value;
+    console.log('task', taskStatus);
+        
+    if(name === ""){
+        document.getElementById('fullNameValidationError').innerHTML="**please fill username";
+        return false;
+    }if((name.length<=3)||(name.length>20)){
+        document.getElementById('fullNameValidationError').innerHTML="**name must contains 3-20 letter";
+        return false;
+    }
+    if((name.length>=3) && (name.length<20)){
+        document.getElementById('fullNameValidationError').innerHTML="";
+    }
+    if(email == ""){
+        document.getElementById('emailError').innerHTML="**please fill email";
+        return false;
+    }if(email.indexOf('@')<=0){
+        document.getElementById('emailError').innerHTML="**@ is not to place in first place";
+        return false; 
+    }if((email.charAt(email.length-4)!=".")&&(email.charAt(email.length-3)!=".")){
+        document.getElementById('emailError').innerHTML="**. is not in right place";
+        return false; 
+    }if(mobileno== ""){
+        document.getElementById('mobilenumError').innerHTML="**please fill mobile number";
+        return false;
+    }if(isNaN(mobileno)){
+        document.getElementById('mobilenumError').innerHTML="**mobile number must not contain letter";
+        return false;
+    }if((mobileno.toString().length)!== 10){
+        document.getElementById('mobilenumError').innerHTML="**mobile number must have 10 numbers ";
+        return false;
+    }if((mobileno.toString().length) === 10){
+        document.getElementById('mobilenumError').innerHTML="";
+    }
+    if(project== ""){
+        document.getElementById('projectError').innerHTML="**please fill project name";
+        return false;
+    }if((project.toString().length<=3)||(project.toString.length>30)){
+        document.getElementById('projectError').innerHTML="**project must contains 3-30 letter";
+        return false;
+    }if((project.toString().length>=3) && (project.toString.length<30)){
+        document.getElementById('projectError').innerHTML="";
+    }if(task== ""){
+        document.getElementById('taskError').innerHTML="**please fill task name";
+        return false;
+    }if((task.toString().length<=3)||(task.toString().length>30)){
+        document.getElementById('taskError').innerHTML="**task decpition must contains 3-30 letter";
+        return false;
+    }if((task.toString().length>=3)&&(task.toString().length<30)){
+        document.getElementById('taskError').innerHTML="";
+    }
+    if(!startDate){
+        document.getElementById('startDateError').innerHTML="Select a valid start date";
+        return false
+    }
+    if(startDate){
+        document.getElementById('startDateError').innerHTML="";
+    }
+    if(!endDate){
+        document.getElementById('endDateError').innerHTML="Select a valid end date";
+        return false
+    }
+    if(endDate){
+        document.getElementById('endDateError').innerHTML="";
+    }
+    if(
+        (name.length>=3) && (name.length<20) && 
+        ((mobileno.toString().length) === 10)&&
+        ((project.toString().length>=3) && (project.toString.length<30))&&
+        (task.toString().length>=3)&&(task.toString().length<30)&&
+        startDate&&
+        endDate){
+        return true;
+    }
+       
+}
+    </script>
+</body>
+
+</html>
